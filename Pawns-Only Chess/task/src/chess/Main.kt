@@ -17,6 +17,8 @@ var horizonSecond = 0
 var vertical = 0
 var verticalSecond = 0
 var ok = 0
+var doubleMoveWhite = "0000"
+var doubleMoveBlack = "0000"
 
 fun main() {
     val regex = Regex("[a-h][1-8][a-h][1-8]")
@@ -54,7 +56,7 @@ fun main() {
             println("$firstName's turn:")
             str1 = readln().toString()
             if (regex.matches(str1)) {
-                changeChessDataWhite(str1)
+                movingChessDataWhite(str1)
             } else if (str1 == "exit") {
                 break
             } else println("Invalid Input")
@@ -70,7 +72,7 @@ fun main() {
             println("$secondName's turn:")
             str2 = readln().toString()
             if (regex.matches(str2)) {
-                changeChessDataBlack(str2)
+                movingChessDataBlack(str2)
             } else if (str2 == "exit") {
                 break
             } else println("Invalid Input")
@@ -87,14 +89,14 @@ fun main() {
 fun printChess() {
     println("  +---+---+---+---+---+---+---+---+")
     for (i in 1 until 9) {
-        print("${9-i}")
-        println(chList[i-1].joinToString(prefix = " | ", postfix = " | ", separator = " | "))
+        print("${9 - i}")
+        println(chList[i - 1].joinToString(prefix = " | ", postfix = " | ", separator = " | "))
         println("  +---+---+---+---+---+---+---+---+")
     }
     println("    a   b   c   d   e   f   g   h")
 }
 
-fun changeChessDataWhite(input: String) {
+fun movingChessDataWhite(input: String) {
 
     horizon = 8 - input[1].digitToInt()
     horizonSecond = 8 - input[3].digitToInt()
@@ -123,18 +125,37 @@ fun changeChessDataWhite(input: String) {
                 chList[horizonSecond][verticalSecond] = "W"
                 chList[horizon][vertical] = " "
                 ok = 1
+                doubleMoveWhite = "0000"
             } else if (horizon - horizonSecond == 2 && horizon == 6 && vertical == verticalSecond) {
-                if (chList[horizonSecond][verticalSecond] == " " && chList[horizonSecond+1][verticalSecond] == " ") {
+                if (chList[horizonSecond][verticalSecond] == " " && chList[horizonSecond + 1][verticalSecond] == " ") {
                     chList[horizonSecond][verticalSecond] = "W"
                     chList[horizon][vertical] = " "
                     ok = 1
+                    doubleMoveWhite = str1
+                } else println("Invalid Input")
+            } else if (horizon - horizonSecond == 1 && (vertical - verticalSecond == 1 || vertical - verticalSecond == -1)) {
+                if (input[2] == doubleMoveBlack[0] && input[2] == doubleMoveBlack[2] && (input[3].digitToInt() - doubleMoveBlack[3].digitToInt() == 1) && (doubleMoveBlack[1].digitToInt() - input[3].digitToInt() == 1)) {
+                    chList[horizonSecond][verticalSecond] = "W"
+                    chList[horizonSecond + 1][verticalSecond] = " "
+                    chList[horizon][vertical] = " "
+                    ok = 1
+                    doubleMoveWhite = "0000"
+
+
                 } else println("Invalid Input")
             } else println("Invalid Input")
+        } else if (chList[horizonSecond][verticalSecond] == "B") {
+            if (horizon - horizonSecond == 1 && (vertical - verticalSecond == 1 || vertical - verticalSecond == -1)) {
+                chList[horizonSecond][verticalSecond] = "W"
+                chList[horizon][vertical] = " "
+                ok = 1
+                doubleMoveWhite = "0000"
+            } else println("Invalid Input")
         } else println("Invalid Input")
-    } else println("No white pawn at ${input[0]}${input[1]}")
+    } else println("No white pawn at ${input.substring(0, 2)}")
 }
 
-fun changeChessDataBlack(input: String) {
+fun movingChessDataBlack(input: String) {
 
     horizon = 8 - input[1].digitToInt()
     horizonSecond = 8 - input[3].digitToInt()
@@ -158,18 +179,35 @@ fun changeChessDataBlack(input: String) {
     if (input[2] == 'h') verticalSecond = 7
 
     if (chList[horizon][vertical] == "B") {
-        if (chList[horizonSecond][verticalSecond] == " " && vertical == verticalSecond) {
-            if (horizonSecond - horizon == 1) {
+        if (chList[horizonSecond][verticalSecond] == " ") {
+            if (horizonSecond - horizon == 1 && vertical == verticalSecond) {
                 chList[horizonSecond][verticalSecond] = "B"
                 chList[horizon][vertical] = " "
                 ok = 1
+                doubleMoveBlack = "0000"
             } else if (horizonSecond - horizon == 2 && horizon == 1 && vertical == verticalSecond) {
-                if (chList[horizonSecond][verticalSecond] == " " && chList[horizonSecond-1][verticalSecond] == " ") {
+                if (chList[horizonSecond][verticalSecond] == " " && chList[horizonSecond - 1][verticalSecond] == " ") {
                     chList[horizonSecond][verticalSecond] = "B"
                     chList[horizon][vertical] = " "
                     ok = 1
+                    doubleMoveBlack = str2
+                } else println("Invalid Input")
+            } else if (horizonSecond - horizon == 1 && (vertical - verticalSecond == 1 || vertical - verticalSecond == -1)) {
+                if (input[2] == doubleMoveWhite[0] && input[2] == doubleMoveWhite[2] && (input[3].digitToInt() - doubleMoveWhite[1].digitToInt() == 1) && (doubleMoveWhite[3].digitToInt() - input[3].digitToInt() == 1)) {
+                    chList[horizonSecond][verticalSecond] = "B"
+                    chList[horizonSecond - 1][verticalSecond] = " "
+                    chList[horizon][vertical] = " "
+                    ok = 1
+                    doubleMoveBlack = "0000"
                 } else println("Invalid Input")
             } else println("Invalid Input")
+        } else if (chList[horizonSecond][verticalSecond] == "W") {
+            if (horizonSecond - horizon == 1 && (vertical - verticalSecond == 1 || vertical - verticalSecond == -1)) {
+                chList[horizonSecond][verticalSecond] = "B"
+                chList[horizon][vertical] = " "
+                ok = 1
+                doubleMoveBlack = "0000"
+            } else println("Invalid Input")
         } else println("Invalid Input")
-    } else println("No black pawn at ${input[0]}${input[1]}")
+    } else println("No black pawn at ${input.substring(0, 2)}")
 }
