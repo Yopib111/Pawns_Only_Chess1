@@ -71,6 +71,19 @@ fun main() {
                         str1 = "exit"
                         ok = 0
                     }
+                    5 -> {
+                        printChess()
+                        println("Stalemate!")
+                        str1 = "exit"
+                        ok = 0
+                    }
+                    6 -> {
+                        printChess()
+                        println("Stalemate!")
+                        str1 = "exit"
+                        ok = 0
+                    }
+
                 }
             } else if (str1 == "exit") {
                 break
@@ -101,6 +114,18 @@ fun main() {
                         str2 = "exit"
                         ok = 0
                     }
+                    5 -> {
+                        printChess()
+                        println("Stalemate!")
+                        str2 = "exit"
+                        ok = 0
+                    }
+                    6 -> {
+                        printChess()
+                        println("Stalemate!")
+                        str2 = "exit"
+                        ok = 0
+                    }
                 }
 
             } else if (str2 == "exit") {
@@ -111,7 +136,9 @@ fun main() {
             printChess()
             ok = 0
         }
-    } while (str2 != "exit")
+        if (str2 == "exit") break
+
+    } while (str2 != "exit" || str1 != "exit")
 
     println("Bye!")
 
@@ -254,32 +281,53 @@ fun checkEndGame(): Int {
     var whiteEatAllBlack: Boolean = true
     var blackEatAllWhite: Boolean = true
 
+// проверяем что больше невозможно сделать ход белыми
+    var checkAvailableMoveWhite = 0
+    for (i in 1 .. 6) {
+        for (j in 0 .. 7) {
+            if (chList[i][j] == "W" && j == 0) {
+                if (chList[i-1][j] == " " || chList[i-1][j+1] == "B") checkAvailableMoveWhite++
+            } else if (chList[i][j] == "W" && j == 7) {
+                if (chList[i-1][j] == " " || chList[i-1][j-1] == "B") checkAvailableMoveWhite++
+            } else if (chList[i][j] == "W") {
+                if (chList[i-1][j-1] == "B" || chList[i-1][j+1] == "B" || chList[i-1][j] == " ") checkAvailableMoveWhite++
+            }
+        }
+    }
+    if (checkAvailableMoveWhite == 0) stopGameCode = 5
+
+// проверяем что больше невозможно сделать ход черными
+    var checkAvailableMoveBlack = 0
+    for (i in 1 .. 6) {
+        for (j in 0 .. 7) {
+            if (chList[i][j] == "B" && j == 0) {
+                if (chList[i+1][j] == " " || chList[i+1][j+1] == "W") checkAvailableMoveBlack++
+            } else if (chList[i][j] == "B" && j == 7) {
+                if (chList[i+1][j] == " " || chList[i+1][j-1] == "W") checkAvailableMoveBlack++
+            } else if (chList[i][j] == "B") {
+                if (chList[i+1][j-1] == "W" || chList[i+1][j+1] == "W" || chList[i+1][j] == " ") checkAvailableMoveBlack++
+            }
+        }
+    }
+    if (checkAvailableMoveBlack == 0) stopGameCode = 6
+
 // проверяем что белые выиграли - на поле не должно остаться элементов "В"
-    for (j in 0 until 7) {
+    for (j in 0 .. 7) {
         if ("B" in chList[j]) whiteEatAllBlack = false
     }
-    if (whiteEatAllBlack) {
-        stopGameCode = 1
-    }
+    if (whiteEatAllBlack) stopGameCode = 1
 
 // проверяем что черные выиграли - на поле не должно остаться элементов "W"
-    for (i in 0 until 7) {
+    for (i in 0 .. 7) {
         if ("W" in chList[i]) blackEatAllWhite = false
     }
-    if (blackEatAllWhite) {
-        stopGameCode = 2
-    }
+    if (blackEatAllWhite) stopGameCode = 2
 
-// проверяем что белые достигли нижнего поля
+// проверяем что белые достигли верхнего поля
     if ("W" in chList[0]) stopGameCode = 3
 
-
-// проверяем что черные достигли верхнего поля
+// проверяем что черные достигли нижнего поля
     if ("B" in chList[7]) stopGameCode = 4
-
-// проверяем что больше невозможно сделать ход черными - тогда белые победили
-
-
 
     return stopGameCode
 }
